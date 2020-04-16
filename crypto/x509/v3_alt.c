@@ -121,6 +121,17 @@ STACK_OF(CONF_VALUE) *i2v_GENERAL_NAME(X509V3_EXT_METHOD *method,
                 return NULL;
             break;
         default:
+            /* check if the value is something printable */
+            if (gen->d.otherName->value->type == V_ASN1_IA5STRING)
+                if (X509V3_add_value("othername",
+                            gen->d.otherName->value->value.ia5string->data,
+                            &ret))
+                return ret;
+            if (gen->d.otherName->value->type == V_ASN1_UTF8STRING)
+                if (X509V3_add_value("othername",
+                            gen->d.otherName->value->value.utf8string->data,
+                            &ret))
+                return ret;
             if (!X509V3_add_value("othername", "<unsupported>", &ret))
                 return NULL;
             break;
